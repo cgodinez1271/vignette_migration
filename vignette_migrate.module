@@ -1,0 +1,80 @@
+<?php
+
+/**
+* @file
+* This space intentionally left not blank.
+*/
+
+/**
+* Fetches an NID or an array of NIDs based on a field value.
+*
+* @param string|array $value
+*   The value to be searched for.
+* @param string $entity_type
+*   The name of the target entity type.
+* @param string $bundle
+*   The name of the target entity bundle.
+* @param string $field
+*   The name of the field within the target.
+*
+* @return mixed
+*   The NID or array of NIDs of the node(s) containing the field value if
+*   found. If no value is passed, simply return.
+* @throws MigrateException
+*   If variable ew_migration_exceptions is set and field value isn't found.
+ */
+ function _isFieldToNid($value, $entity_type, $bundle, $field) {
+	// If no value was passed, do not return a value.
+	if (!$value) {
+		return;
+	}
+
+	// Find all nodes containing the field value.
+	$query = new EntityFieldQuery();
+	$result = $query
+		->entityCondition('entity_type', $entity_type)
+		->entityCondition('bundle', $bundle)
+		->fieldCondition($field, 'value', 'NULL', '!=')
+		->fieldCondition($field, 'value', (array) $value, 'IN')
+		->execute();
+
+	// If nodes were found, obtain their NIDs and return them.
+	if (!empty($result)) {
+		foreach ($result['node'] as $node) {
+			$ids[] = $node->nid;
+	   }
+	   return is_array($value) ? $ids : $ids[0];
+	}
+
+   	// Unable to find field value.
+	if (variable_get('ew_migration_exceptions', FALSE)) {
+		$trace = debug_backtrace();
+		throw new MigrateException($trace[1]['function']  . ' called _isFieldToNid: unknown ' . $bundle . ' ' . $field . ' value "' . print_r($value, TRUE) . '"');
+	}
+}
+
+/**
+* Fetches an Gallery content type NID based on a Legacy ID.
+*
+* @param string|array $value
+*   The legacy ID or an array of legacy IDs.
+*
+* @return int|array
+*   The NID or array of NIDs upon success.
+*/
+function _isGalleryLegacyIDtoNID($value) {
+	return _isFieldToNid($value, 'node', 'Gallery', 'field_legacy_id');
+}
+
+/**
+* Fetches an Tout content type NID based on a Legacy ID.
+*
+* @param string|array $value
+*   The legacy ID or an array of legacy IDs.
+*
+* @return int|array
+*   The NID or array of NIDs upon success.
+*/
+function _isToutLegacyIDtoNID($value) {
+	return _isFieldToNid($value, 'node', 'Tout', 'field_legacy_id');
+}

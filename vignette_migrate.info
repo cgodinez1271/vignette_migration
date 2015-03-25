@@ -1,0 +1,21 @@
+name = "InStyle Migrate from Vignette"
+description = "Module to migrate InStyle V6 content to Drupal 7"
+core = 7.x
+package = "InStyle Migration"
+version = 7.x-1.2
+
+dependencies[] = date_migrate
+dependencies[] = migrate
+
+files[] = vignette_migrate.migrate.inc
+
+files[] = image_component.inc
+files[] = bbbproduct.inc
+files[] = gallery.inc
+files[] = lookoftheday.inc
+files[] = tout.inc
+files[] = package.inc
+files[] = packagehub.inc
+files[] = video.inc
+files[] = imagefile.inc
+files[] = galleryupd.inc
